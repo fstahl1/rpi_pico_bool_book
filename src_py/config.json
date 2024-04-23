@@ -1,0 +1,6 @@
+{
+    "neopixel":
+    {
+        "output_pin": 16
+    }
+}

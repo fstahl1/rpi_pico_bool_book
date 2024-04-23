@@ -1,0 +1,8 @@
+{
+    "neopixel":
+    {
+        "rgb_color_page1": "0xFF0000",
+        "rgb_color_page2": "0x00FF00",
+        "rgb_color_page3": "0x0000FF"
+    }
+}
