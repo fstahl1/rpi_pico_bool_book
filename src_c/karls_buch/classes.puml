@@ -1,0 +1,20 @@
+@startuml classes
+
+abstract class AbstractModeIdentifier {
+    +void Initialize()
+    +Mode DetermineMode()
+}
+
+class AdcModeIdentifier {
+    +void Initialize()
+    +Mode DetermineMode()
+}
+
+AbstractModeIdentifier <|-- AdcModeIdentifier
+
+enum Mode {
+    Add
+    Substract
+}
+
+@enduml
