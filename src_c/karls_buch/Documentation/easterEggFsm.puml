@@ -1,0 +1,17 @@
+@startuml
+
+[*] --> IDLE
+IDLE --> IDLE : b0, b1, b2
+IDLE --> BIN3 : b3
+BIN3 --> BIN3 : b3
+BIN3 --> IDLE : b0, b1
+BIN3 --> BIN2 : b2
+BIN2 --> BIN2 : b2
+BIN2 --> IDLE : b0, b3
+BIN2 --> BIN1 : b1
+BIN1 --> BIN1 : b1
+BIN1 --> EASTEREGG : b0
+BIN1 --> IDLE : b2, b3
+EASTEREGG --> IDLE
+
+@enduml
