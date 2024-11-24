@@ -1,19 +1,22 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 
-#include "modes.h"
-
-#include "config.h"
-#include "abstractModeIdentifier.h"
-#include "adcModeIdentifier.h"
-
 #include <iostream>
 #include <iomanip>
 #include <memory> // Include the memory header
 
+#include "abstractModeIdentifier.h"
+#include "adcModeIdentifier.h"
+
 #include "mcp3008.h"
 #include "WS2812.hpp"
 #include "colorConverter.cpp"
+
+#include "modes.h"
+#include "easterEggStates.h"
+
+#include "config.h"
+
 
 #define LED_PIN 12
 #define LED_LENGTH 1
@@ -35,10 +38,6 @@ int main(){
     gpio_init(LED_PIN_INTERNAL);
     gpio_set_dir(LED_PIN_INTERNAL, GPIO_OUT);
 
-    // const uint LED_PIN_1 = 12;
-    // gpio_init(LED_PIN_1);
-    // gpio_set_dir(LED_PIN_1, GPIO_OUT);
-    
     const uint BUTTON_IN_1 = 20;
     gpio_init(BUTTON_IN_1);
     gpio_set_dir(BUTTON_IN_1, GPIO_IN);
@@ -54,104 +53,19 @@ int main(){
 
     Mode mode;
 
-    int full;
-
     bool isLatchActive = false;
 
+    int delayMs = 5;
 
-    // hsv hsvColor{0, 1, 0.4};
-    // rgb rgbColor;
-    
-    // while (true)
-    // {
-    //     sleep_ms(150);
-        
-    //     if (hsvColor.h < 360)
-    //     {
-    //         hsvColor.h++;
-    //     }
-    //     else{
-    //         hsvColor.h = 0;
-    //     }
-        
-    //     rgbColor = hsv2rgb(hsvColor);
-    //     rgbColor.r *= 255;
-    //     rgbColor.g *= 255;
-    //     rgbColor.b *= 255;
-
-    //     std::cout << "r, g, b: " + 
-    //     std::to_string(rgbColor.r) + ", " +
-    //     std::to_string(rgbColor.g) + ", " +
-    //     std::to_string(rgbColor.b) << std::endl;
-    // }
-    
-
-    hsv hsvColor{0, 1, 0.2};
-    rgb rgbColor;
-    
-
+    EeState eeState = EeState::IDLE;
+    void easterEgg(WS2812 led);
+    int eeTimerStartVal = 0;
+    int eeTimer;
 
     while (true){
 
-
-        // for (int iFade = 8; iFade < 100; iFade = iFade+5){
-        //     full = iFade;
-
-        //     for (int i = 0; i < 6; i++) {
-        //         for (int iTrans = 0; iTrans < full; iTrans++)
-        //         {
-        //             if (i == 0) {
-        //                 led.fill(WS2812::RGB(full, iTrans, 0));
-        //             } else if (i == 1) {
-        //                 led.fill(WS2812::RGB(full-iTrans, full, 0));
-        //             } else if (i == 2) {
-        //                 led.fill(WS2812::RGB(0, full, iTrans));
-        //             } else if (i == 3) {
-        //                 led.fill(WS2812::RGB(0, full-iTrans, full));
-        //             } else if (i == 4) {
-        //                 led.fill(WS2812::RGB(iTrans, 0, full));
-        //             } else if (i == 5) {
-        //                 led.fill(WS2812::RGB(full, 0, full-iTrans));
-        //             }
-        //             led.show();
-        //             sleep_ms(125);
-        //         }     
-        //     }
-        // }
-
-        // sleep_ms(300);
-
-
-
-        sleep_ms(10);
+        sleep_ms(delayMs);
         
-        // if (hsvColor.h < 360)
-        // {
-        //     hsvColor.h++;
-        // }
-        // else{
-        //     hsvColor.h = 0;
-        // }
-        //// hsvColor.h = 285;
-        
-        // rgbColor = hsv2rgb(hsvColor);
-        // rgbColor.r *= 255;
-        // rgbColor.g *= 255;
-        // rgbColor.b *= 255;
-
-        // std::cout << "r, g, b: " + 
-        // std::to_string(rgbColor.r) + ", " +
-        // std::to_string(rgbColor.g) + ", " +
-        // std::to_string(rgbColor.b) << std::endl;
-
-
-        // led.fill(WS2812::RGB(rgbColor.r, rgbColor.g, rgbColor.b));
-        // led.show();
-
-
-
-
-
 
         modeIdentifier->PrintState();
         mode = modeIdentifier->IdentifyMode();
@@ -226,30 +140,152 @@ int main(){
             }
         }
         led.show();
-    }
 
+
+        switch (eeState)
+        {
+        case EeState::IDLE:
+            // std::cout << "IDLE" << std::endl;
+            eeTimer = eeTimerStartVal;
+            if (isButton1Pressed && isButton2Pressed)
+            {
+                eeState = EeState::BIN3;
+            }
+            break;
+        case EeState::BIN3:
+            // std::cout << "BIN3" << std::endl;
+            if (isButton1Pressed && isButton2Pressed)
+            {
+                eeState = EeState::BIN3;
+            }
+            else if (isButton2Pressed)
+            {
+                eeState = EeState::BIN2;
+            }
+            else
+            {
+                eeState = EeState::IDLE;
+            }
+            break;
+        case EeState::BIN2:
+            // std::cout << "BIN2" << std::endl;
+            if (isButton2Pressed && !isButton1Pressed)
+            {
+                eeState = EeState::BIN2;
+            }
+            if (!isButton1Pressed && !isButton2Pressed)
+            {
+                eeState = EeState::BIN2_0;
+            }
+            if (isButton1Pressed && isButton2Pressed)
+            {
+                eeState = EeState::BIN2_3;
+            }
+            if (isButton1Pressed && !isButton2Pressed)
+            {
+                eeState = EeState::BIN1;
+            }
+            break;
+        case EeState::BIN2_0:
+            // std::cout << "BIN2_0" << std::endl;
+            if (!isButton1Pressed && !isButton2Pressed)
+            {
+                eeTimer--;
+            }
+            else if (!isButton1Pressed && isButton2Pressed)
+            {
+                eeState = EeState::IDLE;
+            }
+            else if (isButton1Pressed && !isButton2Pressed)
+            {
+                eeState = EeState::BIN1;
+            }
+            else{
+                eeState = IDLE;
+            }
+            if (eeTimer <= 0)
+            {
+                eeState = EeState::IDLE;
+            }
+            break;
+        case EeState::BIN2_3:
+            // std::cout << "BIN2_3" << std::endl;
+            if (isButton1Pressed && isButton2Pressed)
+            {
+                eeTimer--;
+            }
+            else if (isButton1Pressed && !isButton2Pressed)
+            {
+                eeState = EeState::BIN1;
+            }
+            else
+            {
+                eeState = EeState::IDLE;
+            }
+            if (eeTimer <= 0)
+            {
+                eeState = EeState::IDLE;
+            }
+            break;
+        case EeState::BIN1:
+            // std::cout << "BIN1" << std::endl;
+            if (isButton1Pressed && !isButton2Pressed)
+            {
+                eeState = EeState::BIN1;
+            }
+            else if (!isButton1Pressed && !isButton2Pressed)
+            {
+                eeState = EeState::EASTER;
+            }
+            else
+            {
+                eeState = EeState::IDLE;
+            }
+            break;
+        case EeState::EASTER:
+            // std::cout << "EASTER!" << std::endl;
+            easterEgg(led);
+            eeState = EeState::IDLE;
+            break;
+        default:
+            eeState = EeState::IDLE;
+            break;
+        }
+
+    }
     return 0;
 }
 
 
-// int main()
-// {
-//     stdio_init_all();
-
-//     // SPI initialisation. This example will use SPI at 1MHz.
-//     spi_init(SPI_PORT, 1000*1000);
-//     gpio_set_function(PIN_MISO, GPIO_FUNC_SPI);
-//     gpio_set_function(PIN_CS,   GPIO_FUNC_SIO);
-//     gpio_set_function(PIN_SCK,  GPIO_FUNC_SPI);
-//     gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
+void easterEgg(WS2812 led){
     
-//     // Chip select is active-low, so we'll initialise it to a driven-high state
-//     gpio_set_dir(PIN_CS, GPIO_OUT);
-//     gpio_put(PIN_CS, 1);
-//     // For more examples of SPI use see https://github.com/raspberrypi/pico-examples/tree/master/spi
+    hsv hsvColor{0, 1, 0.2};
+    rgb rgbColor;
+    
+    for (size_t i = 0; i < 1000; i++)
+    {
+        
+        if (hsvColor.h < 360)
+        {
+            hsvColor.h++;
+        }
+        else{
+            hsvColor.h = 0;
+        }
+        // hsvColor.h = 285;
 
-//     while (true) {
-//         printf("Hello, world!\n");
-//         sleep_ms(1000);
-//     }
-// }
+        rgbColor = hsv2rgb(hsvColor);
+        rgbColor.r *= 255;
+        rgbColor.g *= 255;
+        rgbColor.b *= 255;
+
+        std::cout << "r, g, b: " + 
+        std::to_string(rgbColor.r) + ", " +
+        std::to_string(rgbColor.g) + ", " +
+        std::to_string(rgbColor.b) << std::endl;
+
+
+        led.fill(WS2812::RGB(rgbColor.r, rgbColor.g, rgbColor.b));
+        led.show();
+    }
+}
