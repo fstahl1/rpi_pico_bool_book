@@ -76,7 +76,7 @@ int main(){
         if (mode == Mode::WIRE){
             if (isButton1Pressed){
                 // gpio_put(LED_PIN_INTERNAL, 1);
-                led.fill(WS2812::RGB(100, 0, 0));
+                led.fill(WS2812::RGB(100, 0, 0)); // red
             }
             else{
                 // gpio_put(LED_PIN_INTERNAL, 0);
@@ -90,13 +90,13 @@ int main(){
             }
             else{
                 // gpio_put(LED_PIN_INTERNAL, 0);
-                led.fill(WS2812::RGB(100, 50, 0));
+                led.fill(WS2812::RGB(100, 100, 0)); // yellow
             }
         }
         if (mode == Mode::AND){
             if (isButton1Pressed && isButton2Pressed){
                 // gpio_put(LED_PIN_INTERNAL, 1);
-                led.fill(WS2812::RGB(100, 100, 0));
+                led.fill(WS2812::RGB(0, 100, 0)); // green
             }
             else{
                 // gpio_put(LED_PIN_INTERNAL, 0);
@@ -106,7 +106,7 @@ int main(){
         else if (mode == Mode::OR){
             if (isButton1Pressed || isButton2Pressed){
                 // gpio_put(LED_PIN_INTERNAL, 1);
-                led.fill(WS2812::RGB(0, 100, 0));
+                led.fill(WS2812::RGB(0, 100, 100)); // cyan
             }
             else{
                 // gpio_put(LED_PIN_INTERNAL, 0);
@@ -116,7 +116,7 @@ int main(){
         else if (mode == Mode::XOR){
             if (isButton1Pressed != isButton2Pressed){
                 // gpio_put(LED_PIN_INTERNAL, 1);
-                led.fill(WS2812::RGB(0, 75, 100));
+                led.fill(WS2812::RGB(0, 0, 100)); // blue
             }
             else{
                 // gpio_put(LED_PIN_INTERNAL, 0);
@@ -132,7 +132,7 @@ int main(){
             }
             if (isLatchActive){
                 // gpio_put(LED_PIN_INTERNAL, 1);
-                led.fill(WS2812::RGB(100, 0, 100));
+                led.fill(WS2812::RGB(100, 0, 100)); // magenta
             }
             else{
                 // gpio_put(LED_PIN_INTERNAL, 0);
