@@ -14,7 +14,7 @@
 #define PIN_SCK  18
 #define PIN_MOSI 19
 
-#define THRESHOLD 25
+#define THRESHOLD 15
 
 AdcModeIdentifier::AdcModeIdentifier() {}
 
