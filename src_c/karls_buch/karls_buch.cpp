@@ -62,7 +62,7 @@ int main(){
     int eeTimerStartVal = 0;
     int eeTimer;
 
-    int value = 80;
+    int value = 60;
 
     while (true){
 
@@ -261,7 +261,7 @@ int main(){
 
 void easterEgg(WS2812 led){
     
-    hsv hsvColor{0, 1, 0.2};
+    hsv hsvColor{0, 1, 0.4};
     rgb rgbColor;
     
     for (size_t i = 0; i < 1000; i++)
