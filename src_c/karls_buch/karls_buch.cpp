@@ -17,6 +17,7 @@
 
 #include "config.h"
 
+#include "hardware/clocks.h"
 
 #define LED_PIN 12
 #define LED_LENGTH 1
@@ -28,6 +29,8 @@ std::unique_ptr<AbstractModeIdentifier> modeIdentifier = std::make_unique<AdcMod
 int main(){
     
     stdio_init_all();
+
+    set_sys_clock_khz(60000, true);
 
     WS2812 led(LED_PIN, LED_LENGTH, pio0, 0, WS2812::FORMAT_RGB);
 
@@ -62,7 +65,7 @@ int main(){
     int eeTimerStartVal = 0;
     int eeTimer;
 
-    int value = 60;
+    int value = 50;
 
     while (true){
 
@@ -261,7 +264,7 @@ int main(){
 
 void easterEgg(WS2812 led){
     
-    hsv hsvColor{0, 1, 0.4};
+    hsv hsvColor{0, 1, 0.2};
     rgb rgbColor;
     
     for (size_t i = 0; i < 1000; i++)
